@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Notification Triage — Built From Scratch</title>
+<meta name="description" content="An original from-scratch build that ranks notifications by priority using semantic analysis of their content — so the message that matters reaches you first." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --accent:#d97706; --accent-soft:#fdf2e3; --ink:#231a0f; --muted:#6a5942;
+    --line:#eee1cd; --bg:#fdfbf6; --card:#ffffff;
+    --serif:'Fraunces',Georgia,serif; --sans:'Inter',system-ui,sans-serif; --mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.65;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:0 28px}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  code{font-family:var(--mono);font-size:.86em;background:var(--accent-soft);padding:.1em .4em;border-radius:4px;color:#b45309}
+  h1,h2,h3{font-family:var(--serif);font-weight:500;line-height:1.15;letter-spacing:-.01em}
+  header.hero{padding:88px 0 56px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:.74rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin:0 0 22px}
+  h1{font-size:clamp(2.6rem,6vw,4.1rem);margin:0 0 18px}
+  .lede{font-size:1.22rem;color:var(--muted);max-width:62ch;margin:0 0 28px}
+  .meta{display:flex;flex-wrap:wrap;gap:10px;font-size:.82rem}
+  .chip{font-family:var(--mono);font-size:.72rem;letter-spacing:.04em;border:1px solid var(--line);border-radius:999px;padding:5px 12px;color:var(--muted);background:var(--card)}
+  section{padding:54px 0;border-bottom:1px solid var(--line)}
+  .kicker{font-family:var(--mono);font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:0 0 14px}
+  h2{font-size:clamp(1.7rem,3.4vw,2.3rem);margin:0 0 20px}
+  h3{font-size:1.2rem;margin:0 0 6px}
+  p{margin:0 0 18px;max-width:68ch}
+  .muted{color:var(--muted)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:8px}
+  .tool{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+  .tool .t{font-family:var(--mono);font-size:.78rem;color:var(--accent);letter-spacing:.04em;margin-bottom:8px}
+  .tool h3{font-size:1.05rem;font-family:var(--sans);font-weight:600;margin-bottom:6px}
+  .tool p{font-size:.92rem;color:var(--muted);margin:0}
+  ol.flow{counter-reset:s;list-style:none;padding:0;margin:24px 0 0}
+  ol.flow li{position:relative;padding:18px 0 18px 56px;border-top:1px solid var(--line)}
+  ol.flow li:before{counter-increment:s;content:counter(s,decimal-leading-zero);position:absolute;left:0;top:18px;font-family:var(--mono);font-size:.8rem;color:var(--accent);border:1px solid var(--line);border-radius:8px;width:38px;height:38px;display:grid;place-items:center;background:var(--card)}
+  ol.flow li h3{font-family:var(--sans);font-size:1.02rem;font-weight:600;margin:0 0 4px}
+  ol.flow li p{margin:0;font-size:.93rem;color:var(--muted)}
+  .callout{background:var(--accent-soft);border:1px solid #ecd5ad;border-radius:14px;padding:24px 26px;margin-top:8px}
+  .callout p:last-child{margin:0}
+  ul.learn{list-style:none;padding:0;margin:8px 0 0}
+  ul.learn li{padding:14px 0 14px 30px;border-top:1px solid var(--line);position:relative;color:var(--muted);max-width:68ch}
+  ul.learn li:before{content:"→";position:absolute;left:0;color:var(--accent);font-family:var(--mono)}
+  ul.learn li b{color:var(--ink);font-weight:600}
+  .price{display:flex;align-items:baseline;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 26px;margin-top:8px}
+  .price .n{font-family:var(--serif);font-size:2.6rem;color:var(--accent);line-height:1}
+  .price .l{color:var(--muted);font-size:.95rem}
+  footer{padding:48px 0 80px}
+  .credit{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px}
+  .credit .k{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+  footer .fine{font-size:.8rem;color:var(--muted);margin-top:22px;text-align:center}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">From-Scratch Build · Natural Language Processing</p>
+    <h1>Notification Triage</h1>
+    <p class="lede">Your phone buzzes forty times a day and maybe two of them actually matter. This build reads the <i>content</i> of each notification and ranks it by priority — so the doctor's message rises and the marketing blast sinks. I rebuilt it from scratch because it's a small, honest NLP problem with an outsized effect on attention.</p>
+    <div class="meta">
+      <span class="chip">Python</span><span class="chip">Text classification</span><span class="chip">Embeddings</span>
+      <span class="chip">Priority ranking</span><span class="chip">Semantic analysis</span><span class="chip">NLP</span>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">What it is</p>
+    <h2>Sorting the urgent from the noise</h2>
+    <p>Notifications arrive in a flat, undifferentiated stream — a flight delay sits next to a game invite sits next to a two-factor code. The system here reads what each one actually <i>says</i> and assigns it a priority, so the stream can be reordered by importance instead of arrival time. It's triage: not deleting anything, just deciding what deserves your attention first.</p>
+    <p>The interesting part is that priority lives in the language. "Your account was accessed from a new device" and "New devices are on sale" share words but not urgency. Telling them apart needs semantic understanding, not keyword spotting — which is exactly what makes it a good NLP study.</p>
+    <div class="price">
+      <div class="n">P0–P3</div>
+      <div class="l">priority tiers the model assigns from content alone — turning an undifferentiated feed into a ranked one.</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">The stack</p>
+    <h2>From raw alert to ranked queue</h2>
+    <p class="muted">Understand the message, score it, order the feed.</p>
+    <div class="grid">
+      <div class="tool"><div class="t">data</div><h3>Labelled notifications</h3><p>A corpus of messages tagged with their real-world priority — the ground truth to learn from.</p></div>
+      <div class="tool"><div class="t">represent</div><h3>Semantic features</h3><p>Encode each message into an embedding that captures intent and urgency, not just words.</p></div>
+      <div class="tool"><div class="t">classify</div><h3>Priority model</h3><p>A classifier that maps a message's meaning to a priority tier.</p></div>
+      <div class="tool"><div class="t">rank</div><h3>Ordering logic</h3><p>Turn per-message scores into a sensible ordering of the whole incoming feed.</p></div>
+      <div class="tool"><div class="t">evaluate</div><h3>Confusion analysis</h3><p>Check the costly mistakes — a high-priority alert misranked as noise is the failure that matters.</p></div>
+      <div class="tool"><div class="t">tune</div><h3>Threshold control</h3><p>Decide how aggressive triage should be — the trade-off between missed-urgent and over-flagging.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">Architecture</p>
+    <h2>How a notification gets ranked</h2>
+    <p>Each incoming message runs the same read-score-place pipeline:</p>
+    <ol class="flow">
+      <li><h3>Ingest</h3><p>Capture the notification's text as it arrives.</p></li>
+      <li><h3>Encode</h3><p>Turn the message into a semantic representation of what it means.</p></li>
+      <li><h3>Score</h3><p>Predict its priority tier from that representation.</p></li>
+      <li><h3>Place</h3><p>Insert it into the feed at the position its priority warrants.</p></li>
+      <li><h3>Learn</h3><p>Fold user corrections back in to sharpen future ranking.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">Reflection</p>
+    <h2>What rebuilding it taught me</h2>
+    <ul class="learn">
+      <li><b>Priority is semantic.</b> Keyword rules break instantly; the same words carry opposite urgency depending on meaning.</li>
+      <li><b>The costly error is asymmetric.</b> Missing one urgent message is far worse than over-ranking a trivial one — the metric has to reflect that.</li>
+      <li><b>Triage, not deletion.</b> The goal is reordering attention, which is a gentler and more useful framing than filtering.</li>
+      <li><b>Thresholds are policy.</b> How aggressively you promote or bury is a product decision dressed as a hyperparameter.</li>
+      <li><b>Feedback closes the loop.</b> User dismissals and opens are the cheapest, truest labels you'll ever get.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="credit">
+      <div class="k">About this build</div>
+      <p style="margin:0">An original, from-scratch build by <b>Andrea</b> — written to learn applied text classification: semantic representation, priority modelling, ranking and cost-sensitive evaluation. Plain HTML/CSS, deployed on GitHub Pages.</p>
+    </div>
+    <p class="fine">Built from scratch by Andrea · one of an ongoing series of learning builds.</p>
+  </div>
+</footer>
+</body>
+</html>
