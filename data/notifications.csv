@@ -1,0 +1,66 @@
+text,sender,priority
+"URGENT: production database is down, customers cannot check out, respond now",ops,high
+"Security alert: your account was accessed from a new device in Kyiv. If this wasn't you act immediately",security,high
+"Your verification code is 481920. It expires in 5 minutes",security,high
+"Payment failed for your subscription. Update your card by tonight or service will be suspended",billing,high
+"ALERT: CPU at 98% on api-prod-01 for the last 10 minutes, pager triggered",ops,high
+"Deadline reminder: your final paper is due in 2 hours, no extensions",calendar,high
+"Wire transfer of $4,200 was initiated from your account. Confirm or report fraud now",billing,high
+"Critical: SSL certificate for the main domain expires today, renew immediately",ops,high
+"Your flight LH401 has been cancelled. Rebook within the next hour to keep your seat",travel,high
+"Fire alarm test failed in building B, evacuate and report to safety officer immediately",ops,high
+"Doctor's office: your test results are ready and require an urgent call back today",personal,high
+"Your password was changed. If you did not do this, secure your account right away",security,high
+"Server outage affecting all EU customers, incident bridge open now, join immediately",ops,high
+"Final notice: invoice #2231 is overdue, pay today to avoid account closure",billing,high
+"Emergency maintenance window starts in 15 minutes, save your work now",ops,high
+"Your two-factor login code is 902113, do not share it with anyone",security,high
+"Suspicious login blocked from a new location, verify it was you immediately",security,high
+"Action required: confirm your shipping address before 6pm or your order ships to the wrong place",orders,high
+"Meeting moved up: the client call is now in 20 minutes, dial in now",calendar,high
+"Your storage is full and backups have stopped, free up space today to avoid data loss",ops,high
+"Reminder: dentist appointment tomorrow at 10am, reply C to confirm",calendar,medium
+"Your package will be delivered today between 2pm and 6pm",orders,medium
+"You have a new direct message from Maria about the project timeline",social,medium
+"Pull request #142 is waiting for your review",work,medium
+"Your monthly statement is ready to view in the app",billing,medium
+"Reminder: team standup at 9:30am in the usual room",calendar,medium
+"Password reset requested. Use this link within 30 minutes if it was you",security,medium
+"Your order has shipped and is on the way, track it here",orders,medium
+"New comment on your document from Alex, take a look when you can",work,medium
+"Calendar: lunch with Sam in 1 hour at the cafe downtown",calendar,medium
+"Your subscription renews in 3 days, manage it anytime in settings",billing,medium
+"A new login to your account from your usual device was successful",security,medium
+"Invoice #2240 has been paid, thank you",billing,medium
+"Your weekly project report is ready for review",work,medium
+"Reminder: submit your timesheet by Friday",work,medium
+"You were mentioned in a thread in the design channel",social,medium
+"Your return has been received, refund will arrive in 3 to 5 business days",orders,medium
+"Flight check-in is now open for your trip next week",travel,medium
+"Battery is at 20 percent, consider charging soon",device,medium
+"Software update available for your laptop, install when convenient",device,medium
+"50% off everything this weekend only, shop the sale now",marketing,low
+"Maria liked your photo",social,low
+"Your weekly newsletter: 5 articles we think you'll enjoy",marketing,low
+"You have 3 new followers this week",social,low
+"Check out our new collection just dropped, free shipping over $50",marketing,low
+"Someone you may know just joined, say hello",social,low
+"Your daily horoscope is ready, see what the stars say",marketing,low
+"We miss you! Come back and get 20% off your next order",marketing,low
+"Trending near you: top picks for the weekend",marketing,low
+"A blog you follow just published a new post",social,low
+"Your fantasy team scored 84 points this week, see the leaderboard",social,low
+"Flash sale ends tonight, last chance for 30% off",marketing,low
+"Jordan commented on a post you might like",social,low
+"New episodes are available in your favorite show, start watching",marketing,low
+"Rate your recent purchase and earn reward points",marketing,low
+"Your screen time report for last week is ready",device,low
+"Discover playlists made just for you this week",marketing,low
+"Happy Friday! Here's a deal to start your weekend",marketing,low
+"Your photo memories from last year are ready to view",social,low
+"Vote in this week's community poll",social,low
+"Limited time: double points on all purchases today",marketing,low
+"A new game your friends are playing, join the fun",social,low
+"Your monthly spending summary looks great, keep it up",marketing,low
+"Tips and tricks to get more out of the app",marketing,low
+"Someone reacted to your story",social,low

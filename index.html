@@ -53,6 +53,9 @@
   .price{display:flex;align-items:baseline;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 26px;margin-top:8px}
   .price .n{font-family:var(--serif);font-size:2.6rem;color:var(--accent);line-height:1}
   .price .l{color:var(--muted);font-size:.95rem}
+  .term{background:#fffdf8;border:1px solid var(--line);border-radius:14px;padding:18px 20px;overflow-x:auto;font-family:var(--mono);font-size:.82rem;line-height:1.6;color:var(--ink)}
+  .term .hi{color:var(--accent);font-weight:500}
+  .term .lo{color:var(--muted)}
   footer{padding:48px 0 80px}
   .credit{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px}
   .credit .k{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
@@ -64,10 +67,10 @@
   <div class="wrap">
     <p class="eyebrow">From-Scratch Build · Natural Language Processing</p>
     <h1>Notification Triage</h1>
-    <p class="lede">Your phone buzzes forty times a day and maybe two of them actually matter. This build reads the <i>content</i> of each notification and ranks it by priority — so the doctor's message rises and the marketing blast sinks. I rebuilt it from scratch because it's a small, honest NLP problem with an outsized effect on attention.</p>
+    <p class="lede">Your phone buzzes forty times a day and maybe two of them actually matter. This Python build reads the <i>content</i> of each notification, scores it on a continuous priority scale, and returns a ranked inbox — so the security alert rises and the marketing blast sinks. A small, honest NLP problem with an outsized effect on attention.</p>
     <div class="meta">
-      <span class="chip">Python</span><span class="chip">Text classification</span><span class="chip">Embeddings</span>
-      <span class="chip">Priority ranking</span><span class="chip">Semantic analysis</span><span class="chip">NLP</span>
+      <span class="chip">Python</span><span class="chip">scikit-learn</span><span class="chip">TF-IDF + LSA</span>
+      <span class="chip">Logistic regression</span><span class="chip">Priority ranking</span><span class="chip">CPU-only</span>
     </div>
   </div>
 </header>
@@ -77,10 +80,10 @@
     <p class="kicker">What it is</p>
     <h2>Sorting the urgent from the noise</h2>
     <p>Notifications arrive in a flat, undifferentiated stream — a flight delay sits next to a game invite sits next to a two-factor code. The system here reads what each one actually <i>says</i> and assigns it a priority, so the stream can be reordered by importance instead of arrival time. It's triage: not deleting anything, just deciding what deserves your attention first.</p>
-    <p>The interesting part is that priority lives in the language. "Your account was accessed from a new device" and "New devices are on sale" share words but not urgency. Telling them apart needs semantic understanding, not keyword spotting — which is exactly what makes it a good NLP study.</p>
+    <p>The interesting part is that priority lives in the language. "Your account was accessed from a new device" and "New devices are on sale" share words but not urgency. Telling them apart needs a semantic representation, not keyword spotting — which is exactly what makes it a good study.</p>
     <div class="price">
-      <div class="n">P0–P3</div>
-      <div class="l">priority tiers the model assigns from content alone — turning an undifferentiated feed into a ranked one.</div>
+      <div class="n">0.941</div>
+      <div class="l">held-out accuracy (16/17) on a 25% stratified split of the seed data — against a ~0.42 majority-class baseline.</div>
     </div>
   </div>
 </section>
@@ -89,14 +92,14 @@
   <div class="wrap">
     <p class="kicker">The stack</p>
     <h2>From raw alert to ranked queue</h2>
-    <p class="muted">Understand the message, score it, order the feed.</p>
+    <p class="muted">Encode the message, score it, order the feed — all in scikit-learn.</p>
     <div class="grid">
-      <div class="tool"><div class="t">data</div><h3>Labelled notifications</h3><p>A corpus of messages tagged with their real-world priority — the ground truth to learn from.</p></div>
-      <div class="tool"><div class="t">represent</div><h3>Semantic features</h3><p>Encode each message into an embedding that captures intent and urgency, not just words.</p></div>
-      <div class="tool"><div class="t">classify</div><h3>Priority model</h3><p>A classifier that maps a message's meaning to a priority tier.</p></div>
-      <div class="tool"><div class="t">rank</div><h3>Ordering logic</h3><p>Turn per-message scores into a sensible ordering of the whole incoming feed.</p></div>
-      <div class="tool"><div class="t">evaluate</div><h3>Confusion analysis</h3><p>Check the costly mistakes — a high-priority alert misranked as noise is the failure that matters.</p></div>
-      <div class="tool"><div class="t">tune</div><h3>Threshold control</h3><p>Decide how aggressive triage should be — the trade-off between missed-urgent and over-flagging.</p></div>
+      <div class="tool"><div class="t">data</div><h3>65 labelled notifications</h3><p>A hand-built seed set tagged high / medium / low (20 / 20 / 25), committed under <code>data/</code>.</p></div>
+      <div class="tool"><div class="t">embed</div><h3>TF-IDF + LSA</h3><p>Uni/bi-gram TF-IDF compressed by truncated SVD into a ~40-dim semantic vector — Latent Semantic Analysis.</p></div>
+      <div class="tool"><div class="t">signal</div><h3>Lexical urgency layer</h3><p>Interpretable cues: urgency-lexicon hits, ALL-CAPS ratio, codes, money, deadline mentions, sender weight.</p></div>
+      <div class="tool"><div class="t">classify</div><h3>Logistic regression</h3><p>Embedding + signals concatenated, mapped to P(low/medium/high). Trains in under a second on CPU.</p></div>
+      <div class="tool"><div class="t">rank</div><h3>Continuous score</h3><p>Probabilities collapse to one priority score in [0,1]; the inbox sorts by it as a strict total order.</p></div>
+      <div class="tool"><div class="t">boost</div><h3>Topic similarity</h3><p>Cosine similarity in LSA space to a user's important topics nudges relevant messages up — semantic, not keyword.</p></div>
     </div>
   </div>
 </section>
@@ -107,12 +110,43 @@
     <h2>How a notification gets ranked</h2>
     <p>Each incoming message runs the same read-score-place pipeline:</p>
     <ol class="flow">
-      <li><h3>Ingest</h3><p>Capture the notification's text as it arrives.</p></li>
-      <li><h3>Encode</h3><p>Turn the message into a semantic representation of what it means.</p></li>
-      <li><h3>Score</h3><p>Predict its priority tier from that representation.</p></li>
-      <li><h3>Place</h3><p>Insert it into the feed at the position its priority warrants.</p></li>
-      <li><h3>Learn</h3><p>Fold user corrections back in to sharpen future ranking.</p></li>
+      <li><h3>Ingest</h3><p>Capture the notification's text and sender as it arrives.</p></li>
+      <li><h3>Embed</h3><p>TF-IDF (1,2-grams) then truncated SVD into a ~40-dim LSA vector.</p></li>
+      <li><h3>Signal</h3><p>Add the lexical layer — urgency hits, caps, codes, money, deadlines, sender weight — and concatenate.</p></li>
+      <li><h3>Score</h3><p>Logistic regression outputs class probabilities, collapsed to one priority score in [0,1].</p></li>
+      <li><h3>Place</h3><p>Sort the feed by score into a strict total order, ties broken by arrival index.</p></li>
     </ol>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">Real output</p>
+    <h2>A mixed batch, ranked</h2>
+    <p><code>python demo.py</code> feeds eight notifications — a security alert, a password reset, a newsletter, a social like, a calendar reminder, a production-down page, a sale, a delivery — and prints the ranked inbox. This is the actual output:</p>
+    <div class="term">
+<span class="lo"> #  score  tier     message</span>
+<span class="lo">──────────────────────────────────────────────────────────</span>
+<span class="hi"> 1  1.000  high     URGENT: production is down, customers cannot…</span>
+<span class="hi"> 2  0.999  high     Security alert: your account was accessed from…</span>
+ 3  0.532  medium   Your package will be delivered today between 2pm…
+ 4  0.509  medium   Your password reset link expires in 30 minutes
+ 5  0.497  medium   Reminder: dentist appointment tomorrow at 10am
+<span class="lo"> 6  0.046  low      Maria liked your photo</span>
+<span class="lo"> 7  0.021  low      Weekly newsletter: 5 articles we think you'll…</span>
+<span class="lo"> 8  0.011  low      50% off everything this weekend only, shop the sale</span>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">Honest by design</p>
+    <h2>What "semantic" does and doesn't mean</h2>
+    <div class="callout">
+      <p>There's no large language model here. "Semantic analysis" means <b>TF-IDF + Latent Semantic Analysis</b> (truncated SVD over the term-document matrix) for a dense embedding, plus a small <b>lexical urgency layer</b> — both fed to a logistic-regression classifier in scikit-learn.</p>
+      <p>That's enough to separate <i>"your account was accessed from a new device"</i> from <i>"new devices are on sale"</i>, it trains in under a second, runs entirely on CPU, and every feature is inspectable. The whole thing is small on purpose.</p>
+    </div>
   </div>
 </section>
 
@@ -134,7 +168,7 @@
   <div class="wrap">
     <div class="credit">
       <div class="k">About this build</div>
-      <p style="margin:0">An original, from-scratch build by <b>Andrea</b> — written to learn applied text classification: semantic representation, priority modelling, ranking and cost-sensitive evaluation. Plain HTML/CSS, deployed on GitHub Pages.</p>
+      <p style="margin:0">An original, from-scratch build by <b>Andrea</b> — a Python notification priority ranker (scikit-learn: TF-IDF + LSA embeddings, a lexical urgency layer, logistic regression) with a committed seed dataset, a demo and a pytest suite. Code on GitHub; this page is plain HTML/CSS on GitHub Pages.</p>
     </div>
     <p class="fine">Built from scratch by Andrea · one of an ongoing series of learning builds.</p>
   </div>
